@@ -1,0 +1,30 @@
+Name: iam.rpc
+ListenOn: 0.0.0.0:8081
+Etcd:
+  Hosts:
+  - 127.0.0.1:2379
+  Key: iam.rpc
+
+# 数据库配置
+DataSource: "postgres://admin:123123@localhost:5432/edu?sslmode=disable"
+
+# Redis 配置
+Cache:
+  - Type: "node"
+    Host: "localhost:6379"
+    Pass: "123123"  # 如果 Redis 没有密码，可以留空
+    Weight: 100
+
+# Log 配置
+Log:
+  ServiceName: "iamService"
+  Mode: "file"
+  Path: "./logs"
+  Level: "info"
+
+#链路追踪
+Telemetry:
+  Name: iam-rpc
+  Endpoint: http://localhost:14268/api/traces
+  Sampler: 1.0
+  Batcher: jaeger

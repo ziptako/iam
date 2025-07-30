@@ -1,0 +1,484 @@
+syntax = "proto3";
+
+package iam;
+
+option go_package = "./iam";
+
+/*============================================================
+userService
+用户管理服务，提供用户的增删改查及角色分配功能
+============================================================*/
+service userService {
+  // CreateUser 创建新用户
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+
+  // GetUser 根据ID获取用户详情
+  rpc GetUser(GetUserRequest) returns (User);
+
+  // UpdateUser 更新用户信息
+  rpc UpdateUser(UpdateUserRequest) returns (User);
+
+  // DeleteUser 删除用户（软删除）
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+
+  // ListUsers 分页查询用户列表
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+
+  // AssignUserRole 为用户分配单个角色
+  rpc AssignUserRole(AssignUserRoleRequest) returns (AssignUserRoleResponse);
+
+  // AssignUserRoles 为用户批量分配角色
+  rpc AssignUserRoles(AssignUserRolesRequest) returns (AssignUserRolesResponse);
+
+  // RemoveUserRole 移除用户的单个角色
+  rpc RemoveUserRole(RemoveUserRoleRequest) returns (RemoveUserRoleResponse);
+
+  // RemoveUserRoles 批量移除用户的角色
+  rpc RemoveUserRoles(RemoveUserRolesRequest) returns (RemoveUserRolesResponse);
+
+  // GetUserRoles 获取用户拥有的所有角色
+  rpc GetUserRoles(GetUserRolesRequest) returns (GetUserRolesResponse);
+
+  // CheckUserRole 检查用户是否拥有指定角色
+  rpc CheckUserRole(CheckUserRoleRequest) returns (CheckUserRoleResponse);
+
+  // CheckUserPermission 检查用户是否具备指定权限
+  rpc CheckUserPermission(CheckUserPermissionRequest) returns (CheckUserPermissionResponse);
+
+  // GetUserByUsername 根据用户名获取用户详情
+  rpc GetUserByUsername(GetUserByUsernameRequest) returns (User);
+
+  // VerifyPassword 验证用户密码
+  rpc VerifyPassword(VerifyPasswordRequest) returns (VerifyPasswordResponse);
+
+  // ChangePassword 修改用户密码
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
+
+}
+
+/*============================================================
+roleService
+角色管理服务，提供角色的增删改查及权限分配功能
+============================================================*/
+service roleService {
+  // CreateRole 创建新角色
+  rpc CreateRole(CreateRoleRequest) returns (CreateRoleResponse);
+
+  // GetRole 根据ID获取角色详情
+  rpc GetRole(GetRoleRequest) returns (Role);
+
+  // UpdateRole 更新角色信息
+  rpc UpdateRole(UpdateRoleRequest) returns (Role);
+
+  // DeleteRole 删除角色（软删除）
+  rpc DeleteRole(DeleteRoleRequest) returns (DeleteRoleResponse);
+
+  // ListRoles 分页查询角色列表
+  rpc ListRoles(ListRolesRequest) returns (ListRolesResponse);
+
+  // AssignRolePermission 为角色分配单个权限
+  rpc AssignRolePermission(AssignRolePermissionRequest) returns (AssignRolePermissionResponse);
+
+  // AssignRolePermissions 为角色批量分配权限
+  rpc AssignRolePermissions(AssignRolePermissionsRequest) returns (AssignRolePermissionsResponse);
+
+  // RemoveRolePermission 移除角色的单个权限
+  rpc RemoveRolePermission(RemoveRolePermissionRequest) returns (RemoveRolePermissionResponse);
+
+  // RemoveRolePermissions 批量移除角色的权限
+  rpc RemoveRolePermissions(RemoveRolePermissionsRequest) returns (RemoveRolePermissionsResponse);
+
+  // GetRolePermissions 获取角色拥有的所有权限
+  rpc GetRolePermissions(GetRolePermissionsRequest) returns (GetRolePermissionsResponse);
+
+  // CheckRolePermission 检查角色是否拥有指定权限
+  rpc CheckRolePermission(CheckRolePermissionRequest) returns (CheckRolePermissionResponse);
+}
+
+/*============================================================
+permissionService
+权限管理服务，提供权限的增删改查功能
+============================================================*/
+service permissionService {
+  // CreatePermission 创建新权限
+  rpc CreatePermission(CreatePermissionRequest) returns (CreatePermissionResponse);
+
+  // GetPermission 根据ID获取权限详情
+  rpc GetPermission(GetPermissionRequest) returns (Permission);
+
+  // UpdatePermission 更新权限信息
+  rpc UpdatePermission(UpdatePermissionRequest) returns (Permission);
+
+  // DeletePermission 删除权限（软删除）
+  rpc DeletePermission(DeletePermissionRequest) returns (DeletePermissionResponse);
+
+  // ListPermissions 分页查询权限列表
+  rpc ListPermissions(ListPermissionsRequest) returns (ListPermissionsResponse);
+}
+
+/*================ 实体定义 ================*/
+
+// User 用户实体，包含用户的基本信息
+message User {
+  int64 id = 1;                    // 用户ID，主键
+  string username = 2;             // 用户名，唯一标识
+  string email = 3;                // 邮箱地址，唯一标识
+  string nickname = 4;             // 用户昵称
+  string phone = 5;                // 手机号码
+  int64 created_at = 6;            // 创建时间戳（毫秒）
+  int64 updated_at = 7;            // 更新时间戳（毫秒）
+}
+
+// Role 角色实体，定义系统中的角色信息
+message Role {
+  int64 id = 1;                    // 角色ID，主键
+  string name = 2;                 // 角色名称
+  string code = 3;                 // 角色编码，唯一标识
+  string description = 4;          // 角色描述
+  int32 sort_order = 5;            // 排序顺序
+  int64 created_at = 6;            // 创建时间戳（毫秒）
+  int64 updated_at = 7;            // 更新时间戳（毫秒）
+}
+
+// Permission 权限实体，定义系统中的权限信息
+message Permission {
+  int64 id = 1;                    // 权限ID，主键
+  string name = 2;                 // 权限名称
+  string code = 3;                 // 权限编码，唯一标识
+  string description = 4;          // 权限描述
+  string resource = 5;             // 资源标识
+  string action = 6;               // 操作类型（如：read, write, delete等）
+  int32 sort_order = 7;            // 排序顺序
+  int64 created_at = 8;            // 创建时间戳（毫秒）
+  int64 updated_at = 9;            // 更新时间戳（毫秒）
+}
+
+/*================ 用户相关请求/响应消息 ================*/
+
+// CreateUserRequest 创建用户请求
+message CreateUserRequest {
+  string username = 1;             // 用户名，唯一标识
+  string email = 2;                // 邮箱地址，唯一标识
+  string password = 3;             // 用户密码
+  string nickname = 4;             // 用户昵称
+  string phone = 5;                // 手机号码
+}
+
+// CreateUserResponse 创建用户响应
+message CreateUserResponse {
+  int64 id = 1;                    // 新创建的用户ID
+}
+
+// GetUserRequest 获取用户请求
+message GetUserRequest {
+  int64 id = 1;                    // 用户ID
+}
+
+// UpdateUserRequest 更新用户请求
+message UpdateUserRequest {
+  int64 id = 1;                    // 用户ID
+  string username = 2;             // 用户名
+  string email = 3;                // 邮箱地址
+  string nickname = 4;             // 用户昵称
+  string phone = 5;                // 手机号码
+}
+
+// DeleteUserRequest 删除用户请求
+message DeleteUserRequest {
+  int64 id = 1;                    // 用户ID
+}
+
+// DeleteUserResponse 删除用户响应
+message DeleteUserResponse {
+  bool success = 1;                // 删除是否成功
+}
+
+// ListUsersRequest 分页查询用户请求
+message ListUsersRequest {
+  int32 page = 1;                  // 页码（从1开始）
+  int32 page_size = 2;             // 每页数量
+  string search = 3;               // 搜索关键词（用户名、邮箱、昵称）
+}
+
+// ListUsersResponse 分页查询用户响应
+message ListUsersResponse {
+  repeated User items = 1;         // 用户列表
+  int64 total = 2;                 // 总数量
+}
+
+// AssignUserRoleRequest 为用户分配单个角色请求
+message AssignUserRoleRequest {
+  int64 user_id = 1;               // 用户ID
+  int64 role_id = 2;               // 角色ID
+}
+
+// AssignUserRoleResponse 为用户分配单个角色响应
+message AssignUserRoleResponse {
+  bool success = 1;                // 分配是否成功
+}
+
+// AssignUserRolesRequest 为用户批量分配角色请求
+message AssignUserRolesRequest {
+  int64 user_id = 1;               // 用户ID
+  repeated int64 role_ids = 2;     // 角色ID列表
+}
+
+// AssignUserRolesResponse 为用户批量分配角色响应
+message AssignUserRolesResponse {
+  bool success = 1;                // 分配是否成功
+}
+
+// RemoveUserRoleRequest 移除用户单个角色请求
+message RemoveUserRoleRequest {
+  int64 user_id = 1;               // 用户ID
+  int64 role_id = 2;               // 角色ID
+}
+
+// RemoveUserRoleResponse 移除用户单个角色响应
+message RemoveUserRoleResponse {
+  bool success = 1;                // 移除是否成功
+}
+
+// RemoveUserRolesRequest 批量移除用户角色请求
+message RemoveUserRolesRequest {
+  int64 user_id = 1;               // 用户ID
+  repeated int64 role_ids = 2;     // 角色ID列表
+}
+
+// RemoveUserRolesResponse 批量移除用户角色响应
+message RemoveUserRolesResponse {
+  bool success = 1;                // 移除是否成功
+}
+
+// GetUserRolesRequest 获取用户角色请求
+message GetUserRolesRequest {
+  int64 user_id = 1;               // 用户ID
+}
+
+// GetUserRolesResponse 获取用户角色响应
+message GetUserRolesResponse {
+  repeated Role roles = 1;         // 用户拥有的角色列表
+}
+
+// CheckUserRoleRequest 检查用户是否拥有角色请求
+message CheckUserRoleRequest {
+  int64 user_id = 1;               // 用户ID
+  int64 role_id = 2;               // 角色ID
+}
+
+// CheckUserRoleResponse 检查用户是否拥有角色响应
+message CheckUserRoleResponse {
+  bool has_role = 1;               // 是否拥有该角色
+}
+
+// CheckUserPermissionRequest 检查用户是否具备权限请求
+message CheckUserPermissionRequest {
+  int64 user_id = 1;               // 用户ID
+  string permission_code = 2;      // 权限编码
+}
+
+// CheckUserPermissionResponse 检查用户是否具备权限响应
+message CheckUserPermissionResponse {
+  bool has_permission = 1;         // 是否具备该权限
+}
+
+// GetUserByUsernameRequest 根据用户名获取用户请求
+message GetUserByUsernameRequest {
+  string username = 1;             // 用户名
+}
+
+// VerifyPasswordRequest 验证密码请求
+message VerifyPasswordRequest {
+  int64 user_id = 1;               // 用户ID
+  string password = 2;             // 待验证的密码
+}
+
+// VerifyPasswordResponse 验证密码响应
+message VerifyPasswordResponse {
+  bool valid = 1;                  // 密码是否正确
+}
+
+// ChangePasswordRequest 修改密码请求
+message ChangePasswordRequest {
+  int64 user_id = 1;               // 用户ID
+  string new_password = 2;         // 新密码
+}
+
+// ChangePasswordResponse 修改密码响应
+message ChangePasswordResponse {
+  bool success = 1;                // 修改是否成功
+}
+/*================ 角色相关请求/响应消息 ================*/
+
+// CreateRoleRequest 创建角色请求
+message CreateRoleRequest {
+  string name = 1;                 // 角色名称
+  string code = 2;                 // 角色编码，唯一标识
+  string description = 3;          // 角色描述
+  int32 sort_order = 4;            // 排序顺序
+}
+
+// CreateRoleResponse 创建角色响应
+message CreateRoleResponse {
+  int64 id = 1;                    // 新创建的角色ID
+}
+
+// GetRoleRequest 获取角色请求
+message GetRoleRequest {
+  int64 id = 1;                    // 角色ID
+}
+
+// UpdateRoleRequest 更新角色请求
+message UpdateRoleRequest {
+  int64 id = 1;                    // 角色ID
+  string name = 2;                 // 角色名称
+  string code = 3;                 // 角色编码
+  string description = 4;          // 角色描述
+  int32 sort_order = 5;            // 排序顺序
+}
+
+// DeleteRoleRequest 删除角色请求
+message DeleteRoleRequest {
+  int64 id = 1;                    // 角色ID
+}
+
+// DeleteRoleResponse 删除角色响应
+message DeleteRoleResponse {
+  bool success = 1;                // 删除是否成功
+}
+
+// ListRolesRequest 分页查询角色请求
+message ListRolesRequest {
+  int32 page = 1;                  // 页码（从1开始）
+  int32 page_size = 2;             // 每页数量
+  string search = 3;               // 搜索关键词（角色名称、编码）
+}
+
+// ListRolesResponse 分页查询角色响应
+message ListRolesResponse {
+  repeated Role items = 1;         // 角色列表
+  int64 total = 2;                 // 总数量
+}
+
+// AssignRolePermissionRequest 为角色分配单个权限请求
+message AssignRolePermissionRequest {
+  int64 role_id = 1;               // 角色ID
+  int64 permission_id = 2;         // 权限ID
+}
+
+// AssignRolePermissionResponse 为角色分配单个权限响应
+message AssignRolePermissionResponse {
+  bool success = 1;                // 分配是否成功
+}
+
+// AssignRolePermissionsRequest 为角色批量分配权限请求
+message AssignRolePermissionsRequest {
+  int64 role_id = 1;               // 角色ID
+  repeated int64 permission_ids = 2; // 权限ID列表
+}
+
+// AssignRolePermissionsResponse 为角色批量分配权限响应
+message AssignRolePermissionsResponse {
+  bool success = 1;                // 分配是否成功
+}
+
+// RemoveRolePermissionRequest 移除角色单个权限请求
+message RemoveRolePermissionRequest {
+  int64 role_id = 1;               // 角色ID
+  int64 permission_id = 2;         // 权限ID
+}
+
+// RemoveRolePermissionResponse 移除角色单个权限响应
+message RemoveRolePermissionResponse {
+  bool success = 1;                // 移除是否成功
+}
+
+// RemoveRolePermissionsRequest 批量移除角色权限请求
+message RemoveRolePermissionsRequest {
+  int64 role_id = 1;               // 角色ID
+  repeated int64 permission_ids = 2; // 权限ID列表
+}
+
+// RemoveRolePermissionsResponse 批量移除角色权限响应
+message RemoveRolePermissionsResponse {
+  bool success = 1;                // 移除是否成功
+}
+
+// GetRolePermissionsRequest 获取角色权限请求
+message GetRolePermissionsRequest {
+  int64 role_id = 1;               // 角色ID
+}
+
+// GetRolePermissionsResponse 获取角色权限响应
+message GetRolePermissionsResponse {
+  repeated Permission permissions = 1; // 角色拥有的权限列表
+}
+
+// CheckRolePermissionRequest 检查角色是否拥有权限请求
+message CheckRolePermissionRequest {
+  int64 role_id = 1;               // 角色ID
+  string permission_code = 2;         // 权限code
+}
+
+// CheckRolePermissionResponse 检查角色是否拥有权限响应
+message CheckRolePermissionResponse {
+  bool has_permission = 1;         // 是否拥有该权限
+}
+
+/*================ 权限相关请求/响应消息 ================*/
+
+// CreatePermissionRequest 创建权限请求
+message CreatePermissionRequest {
+  string name = 1;                 // 权限名称
+  string code = 2;                 // 权限编码，唯一标识
+  string description = 3;          // 权限描述
+  string resource = 4;             // 资源标识
+  string action = 5;               // 操作类型（如：read, write, delete等）
+  int32 sort_order = 6;            // 排序顺序
+}
+
+// CreatePermissionResponse 创建权限响应
+message CreatePermissionResponse {
+  int64 id = 1;                    // 新创建的权限ID
+}
+
+// GetPermissionRequest 获取权限请求
+message GetPermissionRequest {
+  int64 id = 1;                    // 权限ID
+}
+
+// UpdatePermissionRequest 更新权限请求
+message UpdatePermissionRequest {
+  int64 id = 1;                    // 权限ID
+  string name = 2;                 // 权限名称
+  string code = 3;                 // 权限编码
+  string description = 4;          // 权限描述
+  string resource = 5;             // 资源标识
+  string action = 6;               // 操作类型
+  int32 sort_order = 7;            // 排序顺序
+}
+
+// DeletePermissionRequest 删除权限请求
+message DeletePermissionRequest {
+  int64 id = 1;                    // 权限ID
+}
+
+// DeletePermissionResponse 删除权限响应
+message DeletePermissionResponse {
+  bool success = 1;                // 删除是否成功
+}
+
+// ListPermissionsRequest 分页查询权限请求
+message ListPermissionsRequest {
+  int32 page = 1;                  // 页码（从1开始）
+  int32 page_size = 2;             // 每页数量
+  string search = 3;               // 搜索关键词（权限名称、编码、资源）
+  string resource = 4;             // 按资源过滤
+  string action = 5;               // 按操作类型过滤
+}
+
+// ListPermissionsResponse 分页查询权限响应
+message ListPermissionsResponse {
+  repeated Permission items = 1;   // 权限列表
+  int64 total = 2;                 // 总数量
+}

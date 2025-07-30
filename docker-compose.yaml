@@ -1,0 +1,6 @@
+services:
+  iam:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: zipang0218/service/iam:latest
