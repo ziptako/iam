@@ -3,4 +3,4 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: zipang0218/service/iam:latest
+    image: ziptako/iam:latest
