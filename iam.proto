@@ -135,9 +135,8 @@ message Role {
   string name = 2;                 // 角色名称
   string code = 3;                 // 角色编码，唯一标识
   string description = 4;          // 角色描述
-  int32 sort_order = 5;            // 排序顺序
-  int64 created_at = 6;            // 创建时间戳（毫秒）
-  int64 updated_at = 7;            // 更新时间戳（毫秒）
+  int64 created_at = 5;            // 创建时间戳（毫秒）
+  int64 updated_at = 6;            // 更新时间戳（毫秒）
 }
 
 // Permission 权限实体，定义系统中的权限信息
@@ -145,12 +144,13 @@ message Permission {
   int64 id = 1;                    // 权限ID，主键
   string name = 2;                 // 权限名称
   string code = 3;                 // 权限编码，唯一标识
-  string description = 4;          // 权限描述
+  string type = 4;                 // 权限类型 'path', 'button', 'menu';
   string resource = 5;             // 资源标识
   string action = 6;               // 操作类型（如：read, write, delete等）
-  int32 sort_order = 7;            // 排序顺序
-  int64 created_at = 8;            // 创建时间戳（毫秒）
-  int64 updated_at = 9;            // 更新时间戳（毫秒）
+  string http_method = 7;          // 排序顺序
+  string description = 8;          // 权限描述
+  int64 created_at = 9;            // 创建时间戳（毫秒）
+  int64 updated_at = 10;           // 更新时间戳（毫秒）
 }
 
 /*================ 用户相关请求/响应消息 ================*/
@@ -315,7 +315,6 @@ message CreateRoleRequest {
   string name = 1;                 // 角色名称
   string code = 2;                 // 角色编码，唯一标识
   string description = 3;          // 角色描述
-  int32 sort_order = 4;            // 排序顺序
 }
 
 // CreateRoleResponse 创建角色响应
@@ -334,7 +333,6 @@ message UpdateRoleRequest {
   string name = 2;                 // 角色名称
   string code = 3;                 // 角色编码
   string description = 4;          // 角色描述
-  int32 sort_order = 5;            // 排序顺序
 }
 
 // DeleteRoleRequest 删除角色请求
@@ -431,10 +429,11 @@ message CheckRolePermissionResponse {
 message CreatePermissionRequest {
   string name = 1;                 // 权限名称
   string code = 2;                 // 权限编码，唯一标识
-  string description = 3;          // 权限描述
+  string type = 3;                 // 权限类型('path', 'button', 'menu')
   string resource = 4;             // 资源标识
   string action = 5;               // 操作类型（如：read, write, delete等）
-  int32 sort_order = 6;            // 排序顺序
+  string http_method = 6;          // HTTP方法
+  string description = 7;          // 权限描述
 }
 
 // CreatePermissionResponse 创建权限响应
@@ -455,7 +454,6 @@ message UpdatePermissionRequest {
   string description = 4;          // 权限描述
   string resource = 5;             // 资源标识
   string action = 6;               // 操作类型
-  int32 sort_order = 7;            // 排序顺序
 }
 
 // DeletePermissionRequest 删除权限请求

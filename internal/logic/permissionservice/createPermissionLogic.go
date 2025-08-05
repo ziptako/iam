@@ -3,14 +3,13 @@ package permissionservicelogic
 import (
 	"context"
 	"database/sql"
+	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/ziptako/iam/db/model"
 	"github.com/ziptako/iam/iam"
 	"github.com/ziptako/iam/internal/svc"
-	"strings"
-
-	"github.com/zeromicro/go-zero/core/logx"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"strings"
 )
 
 type CreatePermissionLogic struct {
@@ -36,11 +35,17 @@ func (l *CreatePermissionLogic) CreatePermission(in *iam.CreatePermissionRequest
 	if strings.TrimSpace(in.Code) == "" {
 		return nil, status.Error(codes.InvalidArgument, "[CP002] 权限编码不能为空")
 	}
+	if strings.TrimSpace(in.Type) == "" {
+		return nil, status.Error(codes.InvalidArgument, "[CP012] 权限类型不能为空")
+	}
 	if strings.TrimSpace(in.Resource) == "" {
 		return nil, status.Error(codes.InvalidArgument, "[CP003] 资源标识不能为空")
 	}
 	if strings.TrimSpace(in.Action) == "" {
 		return nil, status.Error(codes.InvalidArgument, "[CP004] 操作类型不能为空")
+	}
+	if strings.TrimSpace(in.HttpMethod) == "" {
+		return nil, status.Error(codes.InvalidArgument, "[CP011] 请求方法不能为空")
 	}
 
 	// 检查权限编码是否已存在
@@ -58,9 +63,13 @@ func (l *CreatePermissionLogic) CreatePermission(in *iam.CreatePermissionRequest
 	permission := &model.Permissions{
 		Name:     in.Name,
 		Code:     in.Code,
+		Type:     in.Type,
 		Resource: in.Resource,
 		Action:   in.Action,
-		Type:     "api", // 默认类型为api
+		HttpMethod: sql.NullString{
+			Valid:  true,
+			String: in.HttpMethod,
+		},
 	}
 
 	// 设置可选字段

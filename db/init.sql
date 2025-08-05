@@ -258,8 +258,57 @@ COMMENT ON COLUMN iam.role_permissions.created_by IS '创建人ID';
 
 -- 插入默认权限
 -- Path类型权限（API路径权限）
+-- 用户管理相关API权限
 INSERT INTO iam.permissions (name, code, type, resource, action, http_method, description) VALUES
-('查看用户自身信息', 'GET:user:me', 'path', 'user', 'read', 'GET', '查看用户自身信息的API权限');
+('分页查询用户列表', 'GET:/user', 'path', 'user', 'read', 'GET', '分页查询用户列表的API权限'),
+('查询指定用户详情', 'GET:/user/:id', 'path', 'user', 'read', 'GET', '查询指定用户详情的API权限'),
+('创建用户', 'POST:/user', 'path', 'user', 'write', 'POST', '创建用户的API权限'),
+('批量创建用户', 'POST:/user/batch', 'path', 'user', 'write', 'POST', '批量创建用户的API权限'),
+('更新用户信息', 'PUT:/user/:id', 'path', 'user', 'write', 'PUT', '更新用户基础信息的API权限'),
+('重置用户密码', 'POST:/user/reset-password', 'path', 'user', 'write', 'POST', '管理员重置用户密码的API权限'),
+('删除用户', 'DELETE:/user/:id', 'path', 'user', 'delete', 'DELETE', '删除用户的API权限'),
+('查询用户角色', 'GET:/user/:id/roles', 'path', 'user', 'read', 'GET', '查询用户所有角色的API权限'),
+('分配用户角色', 'PUT:/user/:id/roles', 'path', 'user', 'write', 'PUT', '为用户分配或移除角色的API权限'),
+('切换用户状态', 'PUT:/user/user/status/toggle', 'path', 'user', 'write', 'PUT', '启用或禁用用户的API权限'),
+('修改用户密码', 'PUT:/user/:id/password', 'path', 'user', 'write', 'PUT', '用户修改自己密码的API权限'),
+('获取当前用户信息', 'GET:/user/me', 'path', 'user', 'read', 'GET', '获取当前用户信息的API权限'),
+
+-- 角色管理相关API权限
+('查询角色列表', 'GET:/role', 'path', 'role', 'read', 'GET', '查询角色列表的API权限'),
+('查询角色详情', 'GET:/role/:id', 'path', 'role', 'read', 'GET', '查询角色详情的API权限'),
+('查询角色权限', 'GET:/role/:id/permissions', 'path', 'role', 'read', 'GET', '查询角色权限的API权限'),
+('分配角色权限', 'POST:/role/:id/permissions', 'path', 'role', 'write', 'POST', '为角色分配或移除权限的API权限'),
+('创建角色', 'POST:/role', 'path', 'role', 'write', 'POST', '创建新角色的API权限'),
+('更新角色信息', 'PUT:/role/:id', 'path', 'role', 'write', 'PUT', '更新角色信息的API权限'),
+('删除角色', 'DELETE:/role/:id', 'path', 'role', 'delete', 'DELETE', '删除角色的API权限'),
+('角色继承', 'PUT:/role/:id/inherit', 'path', 'role', 'write', 'PUT', '为角色添加父角色继承的API权限'),
+('移除角色继承', 'DELETE:/role/:id/inherit/:parentId', 'path', 'role', 'write', 'DELETE', '移除角色父角色继承的API权限'),
+
+-- 权限管理相关API权限
+('查询权限列表', 'GET:/permission', 'path', 'permission', 'read', 'GET', '查询所有可分配权限的API权限'),
+('查询权限详情', 'GET:/permission/:id', 'path', 'permission', 'read', 'GET', '查询某个权限详情的API权限'),
+('创建权限', 'POST:/permission', 'path', 'permission', 'write', 'POST', '新增权限的API权限'),
+('更新权限信息', 'PUT:/permission/:id', 'path', 'permission', 'write', 'PUT', '更新权限信息的API权限'),
+('删除权限', 'DELETE:/permission/:id', 'path', 'permission', 'delete', 'DELETE', '删除权限的API权限'),
+
+-- 组织管理相关API权限
+('创建组织节点', 'POST:/organization', 'path', 'organization', 'write', 'POST', '创建组织节点的API权限'),
+('获取组织节点', 'GET:/organization/:id', 'path', 'organization', 'read', 'GET', '获取组织节点的API权限'),
+('更新组织节点', 'PUT:/organization/:id', 'path', 'organization', 'write', 'PUT', '更新组织节点名称的API权限'),
+('删除组织节点', 'DELETE:/organization/:id', 'path', 'organization', 'delete', 'DELETE', '删除组织节点的API权限'),
+('查询组织子节点', 'GET:/organization', 'path', 'organization', 'read', 'GET', '分页查询组织子节点的API权限'),
+('获取组织祖先链', 'GET:/organization/:id/ancestors', 'path', 'organization', 'read', 'GET', '获取组织祖先链的API权限'),
+('获取组织后代树', 'GET:/organization/:id/descendants', 'path', 'organization', 'read', 'GET', '获取组织后代树的API权限'),
+
+-- 认证相关API权限
+('用户登录', 'POST:/auth/login', 'path', 'auth', 'write', 'POST', '用户登录的API权限'),
+
+-- 审计相关API权限
+('查询用户审计日志', 'GET:/audit', 'path', 'audit', 'read', 'GET', '查询用户审计日志的API权限'),
+
+-- 高级功能相关API权限
+('查询用户最终权限', 'GET:/advanced/users/:id/permissions', 'path', 'advanced', 'read', 'GET', '查询用户最终权限的API权限'),
+('校验用户权限', 'POST:/advanced/auth/check-permission', 'path', 'advanced', 'read', 'POST', '校验用户是否拥有指定权限的API权限');
 
 -- Button类型权限（按钮权限）
 INSERT INTO iam.permissions (name, code, type, resource, action, description) VALUES

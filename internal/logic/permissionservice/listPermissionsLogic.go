@@ -34,7 +34,6 @@ func NewListPermissionsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *L
 func (l *ListPermissionsLogic) ListPermissions(in *iam.ListPermissionsRequest) (*iam.ListPermissionsResponse, error) {
 	// 使用工具函数计算分页参数
 	pagination := utils.CalculatePagination(in.Page, in.PageSize)
-
 	search := strings.TrimSpace(in.Search)
 	resource := strings.TrimSpace(in.Resource)
 	action := strings.TrimSpace(in.Action)
@@ -43,7 +42,6 @@ func (l *ListPermissionsLogic) ListPermissions(in *iam.ListPermissionsRequest) (
 	var permissions []*model.Permissions
 	var total int64
 	var err error
-
 	// 根据是否有过滤条件选择不同的查询方法
 	if search == "" && resource == "" && action == "" {
 		// 无过滤条件的分页查询
@@ -79,7 +77,6 @@ func (l *ListPermissionsLogic) ListPermissions(in *iam.ListPermissionsRequest) (
 
 	// 转换为proto消息
 	permissionList := logic.ModelPermissionsToProtoPermissions(permissions)
-
 	return &iam.ListPermissionsResponse{
 		Items: permissionList,
 		Total: total,

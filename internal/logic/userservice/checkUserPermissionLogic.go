@@ -52,7 +52,9 @@ func (l *CheckUserPermissionLogic) CheckUserPermission(in *iam.CheckUserPermissi
 	permission, err := l.svcCtx.PermissionsModel.FindOneByCode(l.ctx, in.PermissionCode)
 	if err != nil {
 		if errors.Is(err, model.ErrNotFound) {
-			return nil, status.Error(codes.NotFound, "[CUP005] Permission not found")
+			return &iam.CheckUserPermissionResponse{
+				HasPermission: false,
+			}, nil
 		}
 		eInfo := "[CUP006] 查询权限失败"
 		l.Logger.Errorf("%v: %v", eInfo, err)
