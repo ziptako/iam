@@ -259,88 +259,37 @@ COMMENT ON COLUMN iam.role_permissions.created_by IS '创建人ID';
 -- 插入默认权限
 -- Path类型权限（API路径权限）
 INSERT INTO iam.permissions (name, code, type, resource, action, http_method, description) VALUES
-('查看用户API', 'user:read:get', 'path', 'user', 'read', 'GET', '查看用户信息的API权限'),
-('创建用户API', 'user:create:post', 'path', 'user', 'create', 'POST', '创建新用户的API权限'),
-('更新用户API', 'user:update:put', 'path', 'user', 'update', 'PUT', '更新用户信息的API权限'),
-('删除用户API', 'user:delete:delete', 'path', 'user', 'delete', 'DELETE', '删除用户的API权限'),
-('查看角色API', 'role:read:get', 'path', 'role', 'read', 'GET', '查看角色信息的API权限'),
-('创建角色API', 'role:create:post', 'path', 'role', 'create', 'POST', '创建新角色的API权限'),
-('更新角色API', 'role:update:put', 'path', 'role', 'update', 'PUT', '更新角色信息的API权限'),
-('删除角色API', 'role:delete:delete', 'path', 'role', 'delete', 'DELETE', '删除角色的API权限'),
-('查看权限API', 'permission:read:get', 'path', 'permission', 'read', 'GET', '查看权限信息的API权限'),
-('管理权限API', 'permission:manage:post', 'path', 'permission', 'manage', 'POST', '管理权限分配的API权限'),
-('查看组织API', 'org:read:get', 'path', 'organization', 'read', 'GET', '查看组织信息的API权限'),
-('管理组织API', 'org:manage:post', 'path', 'organization', 'manage', 'POST', '管理组织结构的API权限');
+('查看用户自身信息', 'GET:user:me', 'path', 'user', 'read', 'GET', '查看用户自身信息的API权限');
 
 -- Button类型权限（按钮权限）
 INSERT INTO iam.permissions (name, code, type, resource, action, description) VALUES
-('用户新增按钮', 'user:create:button', 'button', 'user', 'create', '用户管理页面新增按钮权限'),
-('用户编辑按钮', 'user:update:button', 'button', 'user', 'update', '用户管理页面编辑按钮权限'),
-('用户删除按钮', 'user:delete:button', 'button', 'user', 'delete', '用户管理页面删除按钮权限'),
-('角色新增按钮', 'role:create:button', 'button', 'role', 'create', '角色管理页面新增按钮权限'),
-('角色编辑按钮', 'role:update:button', 'button', 'role', 'update', '角色管理页面编辑按钮权限'),
-('角色删除按钮', 'role:delete:button', 'button', 'role', 'delete', '角色管理页面删除按钮权限'),
-('权限分配按钮', 'permission:assign:button', 'button', 'permission', 'assign', '权限分配按钮权限'),
-('组织新增按钮', 'org:create:button', 'button', 'organization', 'create', '组织管理页面新增按钮权限'),
-('组织编辑按钮', 'org:update:button', 'button', 'organization', 'update', '组织管理页面编辑按钮权限'),
-('组织删除按钮', 'org:delete:button', 'button', 'organization', 'delete', '组织管理页面删除按钮权限');
+('用户新增按钮', 'user:create:button', 'button', 'user', 'create', '用户管理页面新增按钮权限');
 
 -- Menu类型权限（菜单权限）
 INSERT INTO iam.permissions (name, code, type, resource, action, description) VALUES
-('用户管理菜单', 'user:menu', 'menu', 'user', 'view', '用户管理菜单显示权限'),
-('角色管理菜单', 'role:menu', 'menu', 'role', 'view', '角色管理菜单显示权限'),
-('权限管理菜单', 'permission:menu', 'menu', 'permission', 'view', '权限管理菜单显示权限'),
-('组织管理菜单', 'org:menu', 'menu', 'organization', 'view', '组织管理菜单显示权限'),
-('系统管理菜单', 'system:menu', 'menu', 'system', 'view', '系统管理主菜单显示权限');
+('用户管理菜单', 'user:menu', 'menu', 'user', 'view', '用户管理菜单显示权限');
 
 -- 插入默认角色
 INSERT INTO iam.roles (name, code, description, sort_order) VALUES
-('超级管理员', 'super_admin', '系统超级管理员，拥有所有权限', 1),
-('管理员', 'admin', '系统管理员，拥有大部分管理权限', 2),
-('普通用户', 'user', '普通用户，拥有基本查看权限', 3);
+('管理员', 'admin', '系统管理员，拥有系统管理权限', 1),
+('教师', 'teacher', '教师角色，拥有教师管理权限', 2),
+('学生', 'student', '学生角色，拥有学生管理权限', 3),
+('访客', 'guest', '访客角色，拥有访客权限', 3);
 
--- 为超级管理员角色分配所有权限
+-- 为管理员角色分配所有权限
 INSERT INTO iam.role_permissions (role_id, permission_id)
 SELECT r.id, p.id
 FROM iam.roles r, iam.permissions p
-WHERE r.code = 'super_admin';
+WHERE r.code = 'admin';
 
--- 为管理员角色分配部分权限
-INSERT INTO iam.role_permissions (role_id, permission_id)
-SELECT r.id, p.id
-FROM iam.roles r, iam.permissions p
-WHERE r.code = 'admin'
-AND p.code IN (
-    -- API权限
-    'user:read:get', 'user:create:post', 'user:update:put',
-    'role:read:get', 'permission:read:get', 'org:read:get', 'org:manage:post',
-    -- 按钮权限
-    'user:create:button', 'user:update:button',
-    'role:create:button', 'role:update:button',
-    'org:create:button', 'org:update:button',
-    -- 菜单权限
-    'user:menu', 'role:menu', 'permission:menu', 'org:menu', 'system:menu'
-);
-
--- 为普通用户角色分配基本权限
-INSERT INTO iam.role_permissions (role_id, permission_id)
-SELECT r.id, p.id
-FROM iam.roles r, iam.permissions p
-WHERE r.code = 'user'
-AND p.code IN (
-    -- 基本查看API权限
-    'user:read:get', 'role:read:get', 'permission:read:get', 'org:read:get',
-    -- 基本菜单权限
-    'user:menu', 'role:menu', 'permission:menu', 'org:menu'
-);
 
 -- 创建默认超级管理员用户
--- 默认密码: admin123，salt: randomsalt123456789012345678901，password_hash使用bcrypt算法
+-- 默认密码: 123123，salt: randomsalt123456789012345678901，password_hash使用bcrypt算法
 INSERT INTO iam.users (username, password_hash, salt, nickname) VALUES
-('admin', '$2a$10$randomsalt123456789012345678901uN.zmdr9k7uOCQb376NoUnuTJ8iKVjzieMwkOBEOxRIJuPVtkp5/Ey', 'randomsalt123456789012345678901', '超级管理员');
+('admin', '02c022088ee4c9012d0503dbcbb45bac90b0555755f3be0b8f2e11a8968cd40a', '107944d6b89da7f0f9fc2098cc0c372a7cab7a53059e33930c5cec0d0b7961d5', '管理员');
 
 -- 为默认用户分配超级管理员角色
 INSERT INTO iam.user_roles (user_id, role_id)
 SELECT u.id, r.id
 FROM iam.users u, iam.roles r
-WHERE u.username = 'admin' AND r.code = 'super_admin';
+WHERE u.username = 'admin' AND r.code = 'admin';

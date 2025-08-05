@@ -7,6 +7,8 @@ import (
 	"github.com/ziptako/iam/internal/config"
 	"github.com/ziptako/iam/internal/svc"
 
+	permissionserviceServer "github.com/ziptako/iam/internal/server/permissionservice"
+	roleserviceServer "github.com/ziptako/iam/internal/server/roleservice"
 	userserviceServer "github.com/ziptako/iam/internal/server/userservice"
 
 	"github.com/zeromicro/go-zero/core/conf"
@@ -26,7 +28,12 @@ func main() {
 	ctx := svc.NewServiceContext(c)
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
+		// 注册用户服务
 		iam.RegisterUserServiceServer(grpcServer, userserviceServer.NewUserServiceServer(ctx))
+		// 注册角色服务
+		iam.RegisterRoleServiceServer(grpcServer, roleserviceServer.NewRoleServiceServer(ctx))
+		// 注册权限服务
+		iam.RegisterPermissionServiceServer(grpcServer, permissionserviceServer.NewPermissionServiceServer(ctx))
 
 		if c.Mode == service.DevMode || c.Mode == service.TestMode {
 			reflection.Register(grpcServer)
