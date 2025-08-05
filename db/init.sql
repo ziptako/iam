@@ -81,10 +81,10 @@ CREATE TABLE iam.permissions
     CONSTRAINT chk_permissions_http_method CHECK (
         (type = 'path' AND http_method IS NOT NULL) OR
         (type IN ('button', 'menu') AND http_method IS NULL)
-    ),
+    )
     
     -- 确保资源、操作和类型的组合唯一性
-    CONSTRAINT uk_permissions_resource_action_type UNIQUE (resource, action, type, http_method)
+    --CONSTRAINT uk_permissions_resource_action_type UNIQUE (resource, action, type, http_method)
 );
 
 -- 用户角色关联表
